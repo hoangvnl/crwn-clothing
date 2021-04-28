@@ -3,37 +3,35 @@ import HomePage from "./pages/homepage/homepage.component";
 import ShopPage from "./pages/shop/shop.component";
 import Header from "./components/header/header.component";
 import SignInAndSignUpPage from "./pages/sign-in-and-sign-up/sign-in-and-sign-up.component";
+
 import { auth, createUserProfileDocument } from "./firebase/firebase.utils";
-import { Switch, Route } from "react-router-dom";
+import { Switch, Route, Redirect } from "react-router-dom";
+import { setCurrentUser } from "./redux/user/user.action";
+import { connect } from "react-redux";
+
 import React from "react";
 
 class App extends React.Component {
-  constructor() {
-    super();
-    this.state = {
-      currentUser: null,
-    };
-  }
-
   unsubscribeFromAuth = null;
 
   componentDidMount() {
     this.unsubscribeFromAuth = auth.onAuthStateChanged(async (userAuth) => {
+      //onAuthStateCHanged luôn nghe khi có sự thay đổi về auth trên firebase
+      //và thay đổi đó là ở userAuth
+      const { setCurrentUser } = this.props;
+      console.log(userAuth);
       if (userAuth) {
+        //khi có đăng nhập thì userAuth sẽ giữ thông tin
         const userRef = await createUserProfileDocument(userAuth);
         userRef.onSnapshot((snapShot) => {
-          this.setState(
-            {
-              currentUser: {
-                id: snapShot.id,
-                ...snapShot.data(),
-              },
-            },
-            () => console.log(this.state)
-          );
+          setCurrentUser({
+            id: snapShot.id,
+            ...snapShot.data(),
+          });
         });
       } else {
-        this.setState({ currentUser: userAuth });
+        //khi k có đăng nhập thì userAuth sẽ là null
+        setCurrentUser(userAuth);
       }
     });
   }
@@ -45,10 +43,20 @@ class App extends React.Component {
   render() {
     return (
       <div>
-        <Header currentUser={this.state.currentUser} />
+        <Header />
         <Switch>
           <Route exact path="/shop" component={ShopPage} />
-          <Route exact path="/signin" component={SignInAndSignUpPage} />
+          <Route
+            exact
+            path="/signin"
+            render={() =>
+              this.props.currentUser ? (
+                <Redirect to="/" />
+              ) : (
+                <SignInAndSignUpPage />
+              )
+            }
+          />
           <Route path="/" component={HomePage} />
         </Switch>
       </div>
@@ -56,4 +64,15 @@ class App extends React.Component {
   }
 }
 
-export default App;
+const mapStateToProps = ({ user }) => ({ currentUser: user.currentUser });
+//hoặc const mapStateToProps = (state) => ({ currentUser: state.user.currentUser });
+//mapStateToProps trả về value của root reducer
+
+const mapDispatchToProps = (dispatch) => ({
+  setCurrentUser: (user) => dispatch(setCurrentUser(user)), //user lúc này sẽ được pass vào user.action và trở thành payload
+});
+//mapDispatchToProps trả về 1 action
+
+export default connect(mapStateToProps, mapDispatchToProps)(App);
+// vì app không dùng currentUser.
+// vì ngoài việc pass currentUser cho Header, nó chỉ set it mà không dùng tới value

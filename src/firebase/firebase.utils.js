@@ -23,11 +23,13 @@ export const createUserProfileDocument = async (userAuth, additionalData) => {
   // console.log("snapShot", snapShot);
 
   if (!snapShot.exists) {
-    const { email } = userAuth;
+    //nếu không tồn tại thì tạo 1 user
+    const { email, displayName } = userAuth; //có thể bỏ displayName
     const createdAt = new Date();
 
     try {
       await userRef.set({
+        displayName, //có thể bỏ displayName vì displayName đã có trong ...additionalData
         email,
         createdAt,
         ...additionalData,
