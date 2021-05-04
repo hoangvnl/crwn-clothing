@@ -7,11 +7,17 @@ import ShopPage from "./pages/shop/shop.component";
 import CheckoutPage from "./pages/checkout/checkout.component";
 import SignInAndSignUpPage from "./pages/sign-in-and-sign-up/sign-in-and-sign-up.component";
 
-import { auth, createUserProfileDocument } from "./firebase/firebase.utils";
+import {
+  auth,
+  createUserProfileDocument,
+  // addCollectionAndDocuments,
+} from "./firebase/firebase.utils";
 
 import { Switch, Route, Redirect } from "react-router-dom";
 
 import { connect } from "react-redux";
+
+// import { selectCollectionForPreview } from "./redux/shop/shop.selector";
 
 import { selectCurrentUser } from "./redux/user/user.selector";
 import { setCurrentUser } from "./redux/user/user.action";
@@ -26,7 +32,7 @@ class App extends React.Component {
       //onAuthStateCHanged luôn nghe khi có sự thay đổi về auth trên firebase
       //và thay đổi đó là ở userAuth
       const { setCurrentUser } = this.props;
-      console.log(userAuth);
+      // console.log(userAuth);
       if (userAuth) {
         //khi có đăng nhập thì userAuth sẽ giữ thông tin
         const userRef = await createUserProfileDocument(userAuth);
@@ -40,6 +46,10 @@ class App extends React.Component {
         //khi k có đăng nhập thì userAuth sẽ là null
         setCurrentUser(userAuth);
       }
+      // addCollectionAndDocuments(
+      //   "collections",
+      //   collectionArray.map(({ title, items }) => ({ title, items }))
+      // );
     });
   }
 
@@ -74,6 +84,7 @@ class App extends React.Component {
 
 const mapStateToProps = createStructuredSelector({
   currentUser: selectCurrentUser,
+  // collectionArray: selectCollectionForPreview,
 });
 //hoặc const mapStateToProps = (state) => ({ currentUser: state.user.currentUser });
 //mapStateToProps trả về value của root reducer
