@@ -7,11 +7,11 @@ import ShopPage from "./pages/shop/shop.component";
 import CheckoutPage from "./pages/checkout/checkout.component";
 import SignInAndSignUpPage from "./pages/sign-in-and-sign-up/sign-in-and-sign-up.component";
 
-import {
-  auth,
-  createUserProfileDocument,
-  // addCollectionAndDocuments,
-} from "./firebase/firebase.utils";
+// import {
+//   auth,
+//   createUserProfileDocument,
+//   // addCollectionAndDocuments,
+// } from "./firebase/firebase.utils";
 
 import { Switch, Route, Redirect } from "react-router-dom";
 
@@ -20,42 +20,48 @@ import { connect } from "react-redux";
 // import { selectCollectionForPreview } from "./redux/shop/shop.selector";
 
 import { selectCurrentUser } from "./redux/user/user.selector";
-import { setCurrentUser } from "./redux/user/user.action";
 
 import { createStructuredSelector } from "reselect";
 
+import { checkUserSesstion } from "./redux/user/user.action";
+
 class App extends React.Component {
-  unsubscribeFromAuth = null;
+  // unsubscribeFromAuth = null;
 
   componentDidMount() {
-    this.unsubscribeFromAuth = auth.onAuthStateChanged(async (userAuth) => {
-      //onAuthStateCHanged luôn nghe khi có sự thay đổi về auth trên firebase
-      //và thay đổi đó là ở userAuth
-      const { setCurrentUser } = this.props;
-      // console.log(userAuth);
-      if (userAuth) {
-        //khi có đăng nhập thì userAuth sẽ giữ thông tin
-        const userRef = await createUserProfileDocument(userAuth);
-        userRef.onSnapshot((snapShot) => {
-          setCurrentUser({
-            id: snapShot.id,
-            ...snapShot.data(),
-          });
-        });
-      } else {
-        //khi k có đăng nhập thì userAuth sẽ là null
-        setCurrentUser(userAuth);
-      }
-      // addCollectionAndDocuments(
-      //   "collections",
-      //   collectionArray.map(({ title, items }) => ({ title, items }))
-      // );
-    });
+    const { checkUserSesstion } = this.props;
+
+    checkUserSesstion();
+
+    // const { setCurrentUser } = this.props;
+    // this.unsubscribeFromAuth = auth.onAuthStateChanged(async (userAuth) => {
+    //   //onAuthStateCHanged luôn nghe khi có sự thay đổi về auth trên firebase
+    //   //và thay đổi đó là ở userAuth
+    //   const { setCurrentUser } = this.props;
+    //   // console.log(userAuth);
+    //   if (userAuth) {
+    //     //khi có đăng nhập thì userAuth sẽ giữ thông tin
+    //     const userRef = await createUserProfileDocument(userAuth);
+    //     userRef.onSnapshot((snapShot) => {
+    //       setCurrentUser({
+    //         id: snapShot.id,
+    //         ...snapShot.data(),
+    //       });
+    //     });
+    //   } else {
+    //     //khi k có đăng nhập thì userAuth sẽ là null
+    //     setCurrentUser(userAuth);
+    //   }
+    //   // addCollectionAndDocuments(
+    //   //   "collections",
+    //   //   collectionArray.map(({ title, items }) => ({ title, items }))
+    //   // );
+    // });
   }
 
-  componentWillUnmount() {
-    this.unsubscribeFromAuth();
-  }
+  // componentWillUnmount() {
+  //   this.unsubscribeFromAuth();
+  // }
 
   render() {
     return (
@@ -82,6 +88,10 @@ class App extends React.Component {
   }
 }
 
+const mapDispatchToProps = (dispatch) => ({
+  checkUserSesstion: () => dispatch(checkUserSesstion()),
+});
+
 const mapStateToProps = createStructuredSelector({
   currentUser: selectCurrentUser,
   // collectionArray: selectCollectionForPreview,
@@ -89,9 +99,9 @@ const mapStateToProps = createStructuredSelector({
 //hoặc const mapStateToProps = (state) => ({ currentUser: state.user.currentUser });
 //mapStateToProps trả về value của root reducer
 
-const mapDispatchToProps = (dispatch) => ({
-  setCurrentUser: (user) => dispatch(setCurrentUser(user)), //user lúc này sẽ được pass vào user.action và trở thành payload
-});
+// const mapDispatchToProps = (dispatch) => ({
+//   setCurrentUser: (user) => dispatch(setCurrentUser(user)), //user lúc này sẽ được pass vào user.action và trở thành payload
+// });
 //mapDispatchToProps trả về 1 action
 
 export default connect(mapStateToProps, mapDispatchToProps)(App);
