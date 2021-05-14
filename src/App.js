@@ -1,5 +1,5 @@
 import "./App.css";
-import React from "react";
+import React, { useEffect } from "react";
 
 import Header from "./components/header/header.component";
 import HomePage from "./pages/homepage/homepage.component";
@@ -25,68 +25,66 @@ import { createStructuredSelector } from "reselect";
 
 import { checkUserSesstion } from "./redux/user/user.action";
 
-class App extends React.Component {
+const App = ({ checkUserSesstion, currentUser }) => {
   // unsubscribeFromAuth = null;
 
-  componentDidMount() {
-    const { checkUserSesstion } = this.props;
-
+  useEffect(() => {
     checkUserSesstion();
+  }, [checkUserSesstion]);
 
-    // const { setCurrentUser } = this.props;
-    // this.unsubscribeFromAuth = auth.onAuthStateChanged(async (userAuth) => {
-    //   //onAuthStateCHanged luôn nghe khi có sự thay đổi về auth trên firebase
-    //   //và thay đổi đó là ở userAuth
-    //   const { setCurrentUser } = this.props;
-    //   // console.log(userAuth);
-    //   if (userAuth) {
-    //     //khi có đăng nhập thì userAuth sẽ giữ thông tin
-    //     const userRef = await createUserProfileDocument(userAuth);
-    //     userRef.onSnapshot((snapShot) => {
-    //       setCurrentUser({
-    //         id: snapShot.id,
-    //         ...snapShot.data(),
-    //       });
-    //     });
-    //   } else {
-    //     //khi k có đăng nhập thì userAuth sẽ là null
-    //     setCurrentUser(userAuth);
-    //   }
-    //   // addCollectionAndDocuments(
-    //   //   "collections",
-    //   //   collectionArray.map(({ title, items }) => ({ title, items }))
-    //   // );
-    // });
-  }
+  // componentDidMount() {
+  //   const { checkUserSesstion } = this.props;
+
+  //   checkUserSesstion();
+
+  //   // const { setCurrentUser } = this.props;
+  //   // this.unsubscribeFromAuth = auth.onAuthStateChanged(async (userAuth) => {
+  //   //   //onAuthStateCHanged luôn nghe khi có sự thay đổi về auth trên firebase
+  //   //   //và thay đổi đó là ở userAuth
+  //   //   const { setCurrentUser } = this.props;
+  //   //   // console.log(userAuth);
+  //   //   if (userAuth) {
+  //   //     //khi có đăng nhập thì userAuth sẽ giữ thông tin
+  //   //     const userRef = await createUserProfileDocument(userAuth);
+  //   //     userRef.onSnapshot((snapShot) => {
+  //   //       setCurrentUser({
+  //   //         id: snapShot.id,
+  //   //         ...snapShot.data(),
+  //   //       });
+  //   //     });
+  //   //   } else {
+  //   //     //khi k có đăng nhập thì userAuth sẽ là null
+  //   //     setCurrentUser(userAuth);
+  //   //   }
+  //   //   // addCollectionAndDocuments(
+  //   //   //   "collections",
+  //   //   //   collectionArray.map(({ title, items }) => ({ title, items }))
+  //   //   // );
+  //   // });
+  // }
 
   // componentWillUnmount() {
   //   this.unsubscribeFromAuth();
   // }
 
-  render() {
-    return (
-      <div>
-        <Header />
-        <Switch>
-          <Route path="/shop" component={ShopPage} />
-          <Route exact path="/checkout" component={CheckoutPage} />
-          <Route
-            exact
-            path="/signin"
-            render={() =>
-              this.props.currentUser ? (
-                <Redirect to="/" />
-              ) : (
-                <SignInAndSignUpPage />
-              )
-            }
-          />
-          <Route path="/" component={HomePage} />
-        </Switch>
-      </div>
-    );
-  }
-}
+  return (
+    <div>
+      <Header />
+      <Switch>
+        <Route path="/shop" component={ShopPage} />
+        <Route exact path="/checkout" component={CheckoutPage} />
+        <Route
+          exact
+          path="/signin"
+          render={() =>
+            currentUser ? <Redirect to="/" /> : <SignInAndSignUpPage />
+          }
+        />
+        <Route path="/" component={HomePage} />
+      </Switch>
+    </div>
+  );
+};
 
 const mapDispatchToProps = (dispatch) => ({
   checkUserSesstion: () => dispatch(checkUserSesstion()),

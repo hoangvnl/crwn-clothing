@@ -86,7 +86,7 @@ export function* onCheckUserSession() {
 
 export function* signOut() {
   try {
-    auth.signOut();
+    yield auth.signOut();
     yield put(signOutSuccess());
   } catch (error) {
     yield put(signOutFailure(error));
@@ -111,6 +111,7 @@ export function* userSaga() {
     call(onEmailSignInStart),
     call(onCheckUserSession),
     call(onSignUpStart),
+    call(onSignOutStart),
     call(onSignUpSuccess),
   ]);
 }
